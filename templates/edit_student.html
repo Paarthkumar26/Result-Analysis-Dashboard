@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Student</title>
+    <style>
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+            font-family:Arial, sans-serif;
+        }
+
+        body{
+            background:#f4f7fb;
+            padding:30px;
+        }
+
+        .container{
+            max-width:700px;
+            margin:auto;
+            background:white;
+            padding:30px;
+            border-radius:16px;
+            box-shadow:0 6px 18px rgba(0,0,0,0.08);
+        }
+
+        h2{
+            margin-bottom:20px;
+            color:#1f3c88;
+        }
+
+        label{
+            display:block;
+            margin-top:15px;
+            margin-bottom:6px;
+            font-weight:bold;
+        }
+
+        input{
+            width:100%;
+            padding:12px;
+            border:1px solid #d1d5db;
+            border-radius:8px;
+        }
+
+        .btn-group{
+            margin-top:25px;
+            display:flex;
+            gap:12px;
+        }
+
+        button, a{
+            padding:12px 18px;
+            border:none;
+            border-radius:8px;
+            text-decoration:none;
+            font-weight:bold;
+            cursor:pointer;
+        }
+
+        button{
+            background:#1f3c88;
+            color:white;
+        }
+
+        .back-btn{
+            background:#e5e7eb;
+            color:#111827;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Edit Student Record</h2>
+
+        <form action="/admin/update/{{ student.student_id }}" method="POST">
+            <label>Student ID</label>
+            <input type="text" value="{{ student.student_id }}" readonly>
+
+            <label>Name</label>
+            <input type="text" name="name" value="{{ student.name }}" required>
+
+            <label>Password</label>
+            <input type="text" name="password" value="{{ student.password }}" required>
+
+            <label>C++</label>
+            <input type="number" name="cpp" value="{{ student.cpp }}" required>
+
+            <label>Java</label>
+            <input type="number" name="java" value="{{ student.java }}" required>
+
+            <label>Aptitude</label>
+            <input type="number" name="aptitude" value="{{ student.aptitude }}" required>
+
+            <label>DSA</label>
+            <input type="number" name="dsa" value="{{ student.dsa }}" required>
+
+            <div class="btn-group">
+                <button type="submit">Update Record</button>
+                <a href="/admin-dashboard" class="back-btn">Back</a>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

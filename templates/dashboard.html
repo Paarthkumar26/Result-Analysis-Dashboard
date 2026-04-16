@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body{
+            background:#f4f7fb;
+            padding:30px;
+            color:#1f2937;
+        }
+
+        .topbar{
+            background:linear-gradient(135deg,#1f3c88,#2563eb);
+            color:white;
+            padding:24px;
+            border-radius:16px;
+            margin-bottom:25px;
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            flex-wrap:wrap;
+            gap:15px;
+        }
+
+        .topbar h1{
+            font-size:28px;
+            margin-bottom:6px;
+        }
+
+        .topbar p{
+            font-size:15px;
+            opacity:0.95;
+        }
+
+        .logout-btn{
+            color:white;
+            text-decoration:none;
+            background:#dc2626;
+            padding:10px 16px;
+            border-radius:10px;
+            font-weight:bold;
+        }
+
+        .summary-grid{
+            display:grid;
+            grid-template-columns:repeat(4, 1fr);
+            gap:20px;
+            margin-bottom:30px;
+        }
+
+        .card{
+            background:white;
+            padding:22px;
+            border-radius:16px;
+            box-shadow:0 6px 18px rgba(0,0,0,0.08);
+        }
+
+        .card h3{
+            font-size:18px;
+            color:#4b5563;
+            margin-bottom:10px;
+        }
+
+        .card .value{
+            font-size:30px;
+            font-weight:bold;
+            color:#1f3c88;
+        }
+
+        .badge{
+            display:inline-block;
+            margin-top:10px;
+            padding:6px 12px;
+            border-radius:999px;
+            font-size:13px;
+            font-weight:bold;
+        }
+
+        .strong{
+            background:#dcfce7;
+            color:#15803d;
+        }
+
+        .average{
+            background:#fef3c7;
+            color:#b45309;
+        }
+
+        .weak{
+            background:#fee2e2;
+            color:#b91c1c;
+        }
+
+        .insight-grid{
+            display:grid;
+            grid-template-columns:repeat(3, 1fr);
+            gap:20px;
+            margin-bottom:30px;
+        }
+
+        .insight-card{
+            background:white;
+            padding:22px;
+            border-radius:16px;
+            box-shadow:0 6px 18px rgba(0,0,0,0.08);
+        }
+
+        .insight-card h4{
+            color:#6b7280;
+            margin-bottom:10px;
+        }
+
+        .insight-card p{
+            font-size:24px;
+            font-weight:bold;
+            color:#111827;
+        }
+
+        .bottom-grid{
+            display:grid;
+            grid-template-columns:2fr 1fr;
+            gap:20px;
+        }
+
+        .chart-box,
+        .suggestion-box{
+            background:white;
+            padding:24px;
+            border-radius:16px;
+            box-shadow:0 6px 18px rgba(0,0,0,0.08);
+        }
+
+        .chart-box h2,
+        .suggestion-box h2{
+            margin-bottom:20px;
+            color:#1f3c88;
+        }
+
+        .suggestion-box ul{
+            padding-left:20px;
+            line-height:1.8;
+        }
+
+        .student-meta{
+            font-size:14px;
+            margin-top:6px;
+            opacity:0.9;
+        }
+
+        @media(max-width: 1100px){
+            .summary-grid{
+                grid-template-columns:repeat(2, 1fr);
+            }
+
+            .insight-grid{
+                grid-template-columns:1fr;
+            }
+
+            .bottom-grid{
+                grid-template-columns:1fr;
+            }
+        }
+
+        @media(max-width: 650px){
+            .summary-grid{
+                grid-template-columns:1fr;
+            }
+
+            .topbar{
+                flex-direction:column;
+                align-items:flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="topbar">
+        <div>
+            <h1>Welcome, {{ data.name }}</h1>
+            <p>Your personal result analysis dashboard</p>
+            <div class="student-meta">Student ID: {{ data.student_id }}</div>
+        </div>
+        <a href="/logout" class="logout-btn">Logout</a>
+    </div>
+
+    <div class="summary-grid">
+        <div class="card">
+            <h3>C++</h3>
+            <div class="value">{{ data.cpp }}</div>
+            <span class="badge
+                {% if data.cpp_status == 'Strong' %}strong{% elif data.cpp_status == 'Average' %}average{% else %}weak{% endif %}">
+                {{ data.cpp_status }}
+            </span>
+        </div>
+
+        <div class="card">
+            <h3>Java</h3>
+            <div class="value">{{ data.java }}</div>
+            <span class="badge
+                {% if data.java_status == 'Strong' %}strong{% elif data.java_status == 'Average' %}average{% else %}weak{% endif %}">
+                {{ data.java_status }}
+            </span>
+        </div>
+
+        <div class="card">
+            <h3>Aptitude</h3>
+            <div class="value">{{ data.aptitude }}</div>
+            <span class="badge
+                {% if data.aptitude_status == 'Strong' %}strong{% elif data.aptitude_status == 'Average' %}average{% else %}weak{% endif %}">
+                {{ data.aptitude_status }}
+            </span>
+        </div>
+
+        <div class="card">
+            <h3>DSA</h3>
+            <div class="value">{{ data.dsa }}</div>
+            <span class="badge
+                {% if data.dsa_status == 'Strong' %}strong{% elif data.dsa_status == 'Average' %}average{% else %}weak{% endif %}">
+                {{ data.dsa_status }}
+            </span>
+        </div>
+    </div>
+
+    <div class="insight-grid">
+        <div class="insight-card">
+            <h4>Overall Percentage</h4>
+            <p>{{ data.overall_percentage }}%</p>
+        </div>
+
+        <div class="insight-card">
+            <h4>Best Subject</h4>
+            <p>{{ data.best_subject }}</p>
+        </div>
+
+        <div class="insight-card">
+            <h4>Weakest Subject</h4>
+            <p>{{ data.weak_subject }}</p>
+        </div>
+    </div>
+
+    <div class="bottom-grid">
+        <div class="chart-box">
+            <h2>Performance Chart</h2>
+            <canvas id="marksChart"></canvas>
+        </div>
+
+        <div class="suggestion-box">
+            <h2>Suggestions</h2>
+            <ul>
+                {% for item in data.suggestions %}
+                    <li>{{ item }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        const ctx = document.getElementById('marksChart');
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['C++', 'Java', 'Aptitude', 'DSA'],
+                datasets: [{
+                    label: 'Marks',
+                    data: [
+                        {{ data.cpp }},
+                        {{ data.java }},
+                        {{ data.aptitude }},
+                        {{ data.dsa }}
+                    ],
+                    backgroundColor: [
+                        'rgba(37, 99, 235, 0.8)',
+                        'rgba(16, 185, 129, 0.8)',
+                        'rgba(245, 158, 11, 0.8)',
+                        'rgba(239, 68, 68, 0.8)'
+                    ],
+                    borderRadius: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: true
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100
+                    }
+                }
+            }
+        });
+    </script>
+
+</body>
+</html>

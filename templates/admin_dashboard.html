@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+    *{
+        margin:0;
+    padding:0;
+        box-sizing:border-box;
+        font-family:Arial, sans-serif;
+    }
+
+    body{
+        background:#f4f7fb;
+        padding:30px;
+        color:#1f2937;
+    }
+
+    .topbar{
+        background:linear-gradient(135deg,#1f3c88,#2563eb);
+        color:white;
+        padding:24px;
+        border-radius:16px;
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        margin-bottom:25px;
+        flex-wrap:wrap;
+        gap:15px;
+    }
+
+    .topbar h1{
+        font-size:28px;
+    }
+
+    .logout{
+        background:#dc2626;
+        color:white;
+        text-decoration:none;
+        padding:10px 16px;
+        border-radius:10px;
+        font-weight:bold;
+    }
+
+    .stats-grid{
+        display:grid;
+        grid-template-columns:repeat(3,1fr);
+        gap:20px;
+        margin-bottom:25px;
+    }
+
+    .card{
+        background:white;
+        padding:22px;
+        border-radius:16px;
+        box-shadow:0 6px 18px rgba(0,0,0,0.08);
+    }
+
+    .card h3{
+        color:#6b7280;
+        margin-bottom:10px;
+        font-size:18px;
+    }
+
+    .card p{
+        font-size:28px;
+        font-weight:bold;
+        color:#1f3c88;
+    }
+
+    .upload-box,
+    .leaderboard-box,
+    .chart-box{
+        background:white;
+        padding:24px;
+        border-radius:16px;
+        box-shadow:0 6px 18px rgba(0,0,0,0.08);
+        margin-bottom:25px;
+    }
+
+    .upload-box h2,
+    .leaderboard-box h2,
+    .chart-box h2{
+        margin-bottom:18px;
+        color:#1f3c88;
+    }
+
+    input[type="file"]{
+        margin:15px 0;
+        padding:10px;
+        width:100%;
+    }
+
+    button{
+        padding:12px 20px;
+        border:none;
+        border-radius:8px;
+        background:#1f3c88;
+        color:white;
+        cursor:pointer;
+        font-size:15px;
+    }
+
+    .message{
+        margin-bottom:16px;
+        padding:12px 14px;
+        border-radius:8px;
+        font-size:15px;
+    }
+
+    .success{
+        background:#e8f8ee;
+        color:#1e7a3d;
+        border:1px solid #b7e4c7;
+    }
+
+    .error{
+        background:#fdecec;
+        color:#b42318;
+        border:1px solid #f5c2c7;
+    }
+
+    table{
+        width:100%;
+        border-collapse:collapse;
+        margin-top:10px;
+    }
+
+    table th, table td{
+        padding:12px;
+        border-bottom:1px solid #e5e7eb;
+        text-align:left;
+    }
+
+    table th{
+        background:#f8fafc;
+        color:#374151;
+    }
+
+    .analytics-grid{
+        display:grid;
+        grid-template-columns:1fr 1fr;
+        gap:20px;
+        margin-bottom:25px;
+    }
+
+    .mini-card{
+        background:#f8fafc;
+        padding:18px;
+        border-radius:12px;
+    }
+
+    .mini-card h4{
+        color:#6b7280;
+        margin-bottom:8px;
+    }
+
+    .mini-card p{
+        font-size:24px;
+        font-weight:bold;
+        color:#111827;
+    }
+
+    @media(max-width:1000px){
+        .stats-grid{
+            grid-template-columns:1fr;
+        }
+
+        .analytics-grid{
+            grid-template-columns:1fr;
+        }
+    }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+    <h1>Admin Dashboard</h1>
+    <a href="/logout" class="logout">Logout</a>
+</div>
+
+<div class="stats-grid">
+    <div class="card">
+        <h3>Total Students</h3>
+        <p>{{ data.total_students }}</p>
+    </div>
+
+    <div class="card">
+        <h3>Average Score</h3>
+        <p>{{ data.avg_score }}</p>
+    </div>
+
+    <div class="card">
+        <h3>Top Performer</h3>
+        <p>{{ data.top_student }}</p>
+    </div>
+</div>
+
+<div class="upload-box">
+    <h2>Upload Student Data</h2>
+
+    {% if message %}
+        <div class="message {{ msg_type }}">
+            {{ message }}
+        </div>
+    {% endif %}
+
+    <form action="/admin/upload" method="POST" enctype="multipart/form-data">
+        <input type="file" name="file" accept=".csv,.xlsx" required>
+        <button type="submit">Upload File</button>
+    </form>
+
+    <p style="margin-top:15px; color:#6b7280;">
+        Required columns: student_id, name, password, cpp, java, aptitude, dsa
+    </p>
+</div>
+<div class="leaderboard-box">
+    <h2>Search Student Record</h2>
+
+    <form action="/admin/search" method="GET" style="margin-bottom:20px;">
+        <input 
+            type="text" 
+            name="q" 
+            placeholder="Enter Student ID or Name"
+            value="{{ search_query }}"
+            style="width:100%; padding:12px; border:1px solid #d1d5db; border-radius:8px; margin-bottom:12px;"
+        >
+        <button type="submit">Search</button>
+    </form>
+
+    {% if search_query %}
+        <h3 style="margin-bottom:15px;">Search Results for "{{ search_query }}"</h3>
+
+        {% if search_results %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Student ID</th>
+                        <th>Name</th>
+                        <th>C++</th>
+                        <th>Java</th>
+                        <th>Aptitude</th>
+                        <th>DSA</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for student in search_results %}
+                    <tr>
+                        <td>{{ student[0] }}</td>
+                        <td>{{ student[1] }}</td>
+                        <td>{{ student[3] }}</td>
+                        <td>{{ student[4] }}</td>
+                        <td>{{ student[5] }}</td>
+                        <td>{{ student[6] }}</td>
+                        <td>
+                            <a href="/admin/edit/{{ student[0] }}" style="color:#2563eb; font-weight:bold;">Edit</a> |
+                            <a href="/admin/delete/{{ student[0] }}" style="color:#dc2626; font-weight:bold;" onclick="return confirm('Are you sure you want to delete this record?');">Delete</a>
+                        </td>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p style="color:#b42318; font-weight:bold;">No student record found.</p>
+        {% endif %}
+    {% endif %}
+</div>
+<div class="leaderboard-box">
+    <h2>Top 10 Students Leaderboard</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Rank</th>
+                <th>Student ID</th>
+                <th>Name</th>
+                <th>Average Marks</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for student in data.leaderboard %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td>{{ student[0] }}</td>
+                <td>{{ student[1] }}</td>
+                <td>{{ student[2] }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="chart-box">
+    <h2>Class Analytics</h2>
+
+    <div class="analytics-grid">
+        <div class="mini-card">
+            <h4>Average C++</h4>
+            <p>{{ data.cpp_avg }}</p>
+        </div>
+
+        <div class="mini-card">
+            <h4>Average Java</h4>
+            <p>{{ data.java_avg }}</p>
+        </div>
+
+        <div class="mini-card">
+            <h4>Average Aptitude</h4>
+            <p>{{ data.aptitude_avg }}</p>
+        </div>
+
+        <div class="mini-card">
+            <h4>Average DSA</h4>
+            <p>{{ data.dsa_avg }}</p>
+        </div>
+    </div>
+
+    <canvas id="classChart"></canvas>
+</div>
+
+<script>
+    const ctx = document.getElementById('classChart');
+
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['C++', 'Java', 'Aptitude', 'DSA'],
+            datasets: [{
+                label: 'Class Average',
+                data: [
+                    {{ data.cpp_avg }},
+                    {{ data.java_avg }},
+                    {{ data.aptitude_avg }},
+                    {{ data.dsa_avg }}
+                ],
+                backgroundColor: [
+                    'rgba(37, 99, 235, 0.8)',
+                    'rgba(16, 185, 129, 0.8)',
+                    'rgba(245, 158, 11, 0.8)',
+                    'rgba(239, 68, 68, 0.8)'
+                ],
+                borderRadius: 8
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100
+                }
+            }
+        }
+    });
+</script>
+
+</body>
+</html>

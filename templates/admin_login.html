@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Login</title>
+  <link rel="stylesheet" href="/static/style.css" />
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #0f172a, #1e293b, #334155);
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .logo-text {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: white;
+  margin-bottom: 15px;
+  text-transform: uppercase;
+}
+
+.logo-text::after {
+  content: "";
+  display: block;
+  width: 40px;
+  height: 3px;
+  background: #2563eb;
+  margin: 6px auto 0;
+  border-radius: 10px;
+}
+
+    .login-container {
+      width: 380px;
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(14px);
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+      color: white;
+      text-align: center;
+    }
+
+    .logo {
+      width: 80px;
+      margin-bottom: 15px;
+      border-radius: 12px;
+      background: white;
+      padding: 6px;
+    }
+
+    h2 {
+      margin-bottom: 8px;
+      font-size: 28px;
+    }
+
+    p {
+      margin-bottom: 25px;
+      color: #d1d5db;
+      font-size: 14px;
+    }
+
+    .input-group {
+      margin-bottom: 18px;
+      text-align: left;
+    }
+
+    .input-group label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 14px;
+      color: #e5e7eb;
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      outline: none;
+      border-radius: 10px;
+      font-size: 14px;
+      background: rgba(255,255,255,0.15);
+      color: white;
+      box-sizing: border-box;
+    }
+
+    .input-group input::placeholder {
+      color: #cbd5e1;
+    }
+
+    .login-btn {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 10px;
+      background: #2563eb;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s ease;
+    }
+
+    .login-btn:hover {
+      background: #1d4ed8;
+      transform: translateY(-2px);
+    }
+
+    .error {
+      color: #fca5a5;
+      margin-top: 12px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <div class="logo-text">JIMS</div>
+    <h2>Admin Login</h2>
+    <p>Sign in to manage students, results, and dashboard records</p>
+
+    <form action="/admin-login" method="POST">
+      <div class="input-group">
+        <label for="admin_id">Admin ID</label>
+        <input type="text" id="admin_id" name="admin_id" placeholder="Enter Admin ID" required>
+      </div>
+
+      <div class="input-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" placeholder="Enter Password" required>
+      </div>
+
+      <button type="submit" class="login-btn">Login as Admin</button>
+    </form>
+
+    {% if error %}
+      <div class="error">{{ error }}</div>
+    {% endif %}
+  </div>
+</body>
+</html>
