@@ -1,21 +1,30 @@
+import os
+from pathlib import Path
+
+from dotenv import load_dotenv
 from fastapi import FastAPI, Request, Form
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 import mysql.connector
 
+load_dotenv(Path(__file__).resolve().parent / ".env")
+
 app = FastAPI()
 
-app.mount("/static", StaticFiles(directory="static"), name="static")
+_static_dir = os.path.join(os.path.dirname(__file__), "static")
+if os.path.isdir(_static_dir):
+    app.mount("/static", StaticFiles(directory=_static_dir), name="static")
 templates = Jinja2Templates(directory="templates")
 
 
 def get_db_connection():
     return mysql.connector.connect(
-        host="localhost",
-        user="root",
-        password="Paarthkumar@986892",
-        database="result_dashboard"
+        host=os.environ.get("MYSQL_HOST", "localhost"),
+        port=int(os.environ.get("MYSQL_PORT", "3306")),
+        user=os.environ.get("MYSQL_USER", "root"),
+        password=os.environ.get("MYSQL_PASSWORD", ""),
+        database=os.environ.get("MYSQL_DATABASE", "result_dashboard"),
     )
 
 
@@ -292,4 +301,4 @@ def delete_student(student_id: str):
     cursor.close()
     conn.close()
 
-    return RedirectResponse(url="/admin-dashboard", status_code=303)
+    return RedirectResponse(url="/admin-dashboard", status_code=303)
